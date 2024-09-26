@@ -1,0 +1,13 @@
+npm-debug.log*
+yarn-error.log
+node_modules/
+.DS_Store
+dist/
+public_html/
+flow-coverage
+coverage
+.eslintcache
+.prettiercache
+webpack.local-config.js
+*.orig
+*.rej
