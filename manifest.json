@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Firefox Profiler",
   "version": "1.0",
-  "permissions": ["activeTab", "scripting", "tabs", "debugger"],
+  "permissions": ["activeTab", "scripting", "tabs", "debugger", "notifications"],
   "host_permissions": [
     "https://profiler.firefox.com/*",
     "http://localhost:4242/*"
@@ -10,5 +10,12 @@
   "background": {
     "service_worker": "background.js"
   },
-  "action": {}
+  "action": {
+    "default_icon": {
+      "16": "icons/off/icon16.png",
+      "32": "icons/off/icon32.png",
+      "48": "icons/off/icon48.png",
+      "128": "icons/off/icon128.png"
+    }
+  }
 }
