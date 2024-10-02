@@ -175,7 +175,7 @@ async function openProfile(profile) {
           console.log("on load complete", newTabId);
           await chrome.scripting.executeScript({
             target: { tabId: newTabId },
-            func: (profile) => {
+            func: async (profile) => {
               // const jsonProfile = JSON.stringify(profile);
               console.log("executing the content script");
               let isReady = false;
@@ -197,7 +197,7 @@ async function openProfile(profile) {
 
               window.addEventListener("message", listener);
               while (!isReady) {
-                // await new Promise((resolve) => setTimeout(resolve, 100));
+                await new Promise((resolve) => setTimeout(resolve, 100));
                 window.postMessage({ name: "is-ready" }, origin);
               }
 
