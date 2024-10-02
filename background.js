@@ -67,14 +67,27 @@ async function startTracing() {
   await chrome.debugger.attach({ tabId: tabId }, "1.3");
 
   // Define tracing categories
+  // The settings used by the devtools can be found here:
+  // https://source.chromium.org/chromium/chromium/src/+/main:third_party/devtools-frontend/src/front_end/panels/timeline/TimelineController.ts;l=87-103;drc=a59de5d27b5977b0bb8d260634f1d8d45e69cfdf
   const tracingConfig = {
     includedCategories: [
+      "blink.console",
+      "loading",
       "devtools.timeline", // Timeline events
-      "v8.execute", // J/* a */vaScript execution
       "blink.user_timing", // User timing events
-      // "disabled-by-default-v8.cpu_profiler", // CPU profiling events
-      // "disabled-by-default-devtools.timeline", // Detailed timeline events
-      // "toplevel", // High-level events
+      "disabled-by-default-v8.cpu_profiler", // CPU profiling events
+      "disabled-by-default-devtools.timeline", // Detailed timeline events
+      "disabled-by-default-devtools.timeline.frame",
+      "disabled-by-default-devtools.timeline.stack",
+      "disabled-by-default-v8.compile",
+      "disabled-by-default-v8.cpu_profiler",
+      "disabled-by-default-v8.cpu_profiler.hires",
+      "disabled-by-default-devtools.screenshot",
+      "disabled-by-default-lighthouse",
+      "v8.execute", // JavaScript execution
+      "v8",
+      "cppgc",
+      "navigation,rail",
     ],
     transferMode: "ReportEvents", // This ensures events are reported in chunks
   };
