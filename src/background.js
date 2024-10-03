@@ -4,6 +4,8 @@
 
 // @ts-check
 
+import { state } from "./state.js";
+
 /**
  * @typedef {object} CustomWindowObject
  * @property {Array<any>} [receivedProfileChunks]
@@ -12,33 +14,6 @@
 /**
  * @typedef {Window & CustomWindowObject} CustomWindow
  */
-
-const state = {
-  /**
-   * Tracing state.
-   * @type {boolean}
-   * @public
-   */
-  isTracing: false,
-  /**
-   * Tab ID of the current profiled tab.
-   * @type {number | null}
-   * @public
-   */
-  tabId: null,
-
-  startTracing() {
-    this.isTracing = true;
-    setIcons("on", this.tabId);
-  },
-
-  reset() {
-    // Reset the state
-    setIcons("off", this.tabId);
-    this.isTracing = false;
-    this.tabId = null;
-  },
-};
 
 chrome.action.onClicked.addListener(async (tab) => {
   if (!isTabAllowedToProfile(tab)) {
@@ -303,21 +278,4 @@ function isTabAllowedToProfile(tab) {
 
   chrome.notifications.create(notificationId, options, () => {});
   return false;
-}
-
-/**
- * Sets the icon of the extension
- * @param {"on" | "off"} variant
- * @param {number} tabId
- */
-function setIcons(variant, tabId) {
-  chrome.action.setIcon({
-    path: {
-      16: `icons/${variant}/icon16.png`,
-      32: `icons/${variant}/icon32.png`,
-      48: `icons/${variant}/icon48.png`,
-      128: `icons/${variant}/icon128.png`,
-    },
-    tabId,
-  });
 }
