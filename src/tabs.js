@@ -17,6 +17,10 @@ export async function getCurrentTab() {
   return tab;
 }
 
+/**
+ * Check if the tab is allowed to be profiled and show a notification if not.
+ * Chrome privileged pages are not allowed.
+ */
 export function isTabAllowedToProfile(tab) {
   if (!tab.url?.startsWith("chrome://")) {
     // It's not a privileged page.

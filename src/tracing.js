@@ -142,7 +142,14 @@ function asyncReadStream(tabId, streamHandle) {
 }
 
 /**
- * Open a profile in https://profiler.firefox.com/
+ * Open a profile in https://profiler.firefox.com/.
+ *
+ * We get profile chunks and send them one by one instead of concatenating them
+ * inside the extension's window because if the profile data is too large it
+ * fails to send it to the tab silently while calling
+ * chrome.scripting.executeScript. By sending in chunks we make sure to send it
+ * successfully.
+ *
  * @param {Array<string>} profileChunks
  */
 async function openProfile(profileChunks) {

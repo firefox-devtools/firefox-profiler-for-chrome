@@ -8,6 +8,9 @@ import { state } from "./state.js";
 import { isTabAllowedToProfile, getCurrentTab } from "./tabs.js";
 import { startTracing, stopTracingAndCollect, stopTracing } from "./tracing.js";
 
+/**
+ * onClick listener for the extension toolbar button.
+ */
 chrome.action.onClicked.addListener(async (tab) => {
   if (!isTabAllowedToProfile(tab)) {
     return;
@@ -24,6 +27,9 @@ chrome.action.onClicked.addListener(async (tab) => {
   }
 });
 
+/**
+ * Command listener for the keyboard shortcuts.
+ */
 chrome.commands.onCommand.addListener(async (command) => {
   console.log(`Command: ${command}`);
 
