@@ -38,6 +38,7 @@ export async function startTracing() {
     "latencyInfo",
     "disabled-by-default-devtools.timeline.stack",
     "disabled-by-default-v8.cpu_profiler",
+    "disabled-by-default-devtools.screenshot",
   ];
 
   await chrome.debugger.sendCommand({ tabId: tabId }, "Tracing.start", {
