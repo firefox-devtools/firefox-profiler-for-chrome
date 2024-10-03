@@ -18,6 +18,7 @@ jobs:
         node-version: "20"
         cache: 'yarn'
 
+    - run: yarn install --frozen-lockfile
     - run: yarn ts
     - run: yarn lint
     - run: yarn prettier
