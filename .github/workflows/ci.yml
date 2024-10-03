@@ -21,4 +21,3 @@ jobs:
     - run: yarn ts
     - run: yarn lint
     - run: yarn prettier
-
