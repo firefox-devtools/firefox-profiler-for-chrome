@@ -69,31 +69,28 @@ async function startTracing() {
   // Define tracing categories
   // The settings used by the devtools can be found here:
   // https://source.chromium.org/chromium/chromium/src/+/main:third_party/devtools-frontend/src/front_end/panels/timeline/TimelineController.ts;l=87-103;drc=a59de5d27b5977b0bb8d260634f1d8d45e69cfdf
-  const tracingConfig = {
-    includedCategories: [
-      "blink.console",
-      "loading",
-      "devtools.timeline", // Timeline events
-      "blink.user_timing", // User timing events
-      "disabled-by-default-v8.cpu_profiler", // CPU profiling events
-      "disabled-by-default-devtools.timeline", // Detailed timeline events
-      "disabled-by-default-devtools.timeline.frame",
-      "disabled-by-default-devtools.timeline.stack",
-      "disabled-by-default-v8.compile",
-      "disabled-by-default-v8.cpu_profiler",
-      "disabled-by-default-v8.cpu_profiler.hires",
-      "disabled-by-default-devtools.screenshot",
-      "disabled-by-default-lighthouse",
-      "v8.execute", // JavaScript execution
-      "v8",
-      "cppgc",
-      "navigation,rail",
-    ],
-    transferMode: "ReportEvents", // This ensures events are reported in chunks
-  };
+  // and for puppeteer here:
+  // https://github.com/puppeteer/puppeteer/blob/ce1ed7ad74a90acc37f2a5e284ad8d8da360e462/packages/puppeteer-core/src/cdp/Tracing.ts#L72-L84
+  // Currently using puppeteer's categories.
+  const defaultCategories = [
+    "-*",
+    "devtools.timeline",
+    "v8.execute",
+    "disabled-by-default-devtools.timeline",
+    "disabled-by-default-devtools.timeline.frame",
+    "toplevel",
+    "blink.console",
+    "blink.user_timing",
+    "latencyInfo",
+    "disabled-by-default-devtools.timeline.stack",
+    "disabled-by-default-v8.cpu_profiler",
+  ];
 
   await chrome.debugger.sendCommand({ tabId: tabId }, "Tracing.start", {
-    tracingConfig,
+    traceConfig: {
+      includedCategories: defaultCategories,
+    },
+    transferMode: "ReturnAsStream",
   });
 
   state.startTracing(tabId);
@@ -103,62 +100,72 @@ async function stopTracingAndCollect() {
   console.log("stop tracing and open the profile");
   const { tabId } = state;
 
-  const traceEvents = [];
+  // Add the event listener first and then stop the tracing.
+  chrome.debugger.onEvent.addListener(
+    async function tracingCompleteListener(debuggeeId, message, params) {
+      if (message === "Tracing.tracingComplete") {
+        console.log("done waiting for tracing data.");
+        const streamHandle = params.stream;
+        if (!streamHandle) {
+          console.warn("Failed to find the stream!");
+          return;
+        }
 
-  // Collect the tracing data
-  chrome.debugger.onEvent.addListener((source, method, params) => {
-    if (method === "Tracing.dataCollected") {
-      // console.log("canova got the event");
-      // Once data is collected, concatenate it
-      traceEvents.push(...params.value);
-    }
-  });
+        const profileChunks = await readStreamAsync(tabId, streamHandle);
+
+        console.log("Trace data complete, total chunks:", profileChunks.length);
+        chrome.debugger.detach({ tabId }, () => {
+          console.log("Debugger detached");
+        });
+        state.reset();
+
+        openProfile(profileChunks);
+
+        // Remove the listener after receiving Tracing.tracingComplete
+        chrome.debugger.onEvent.removeListener(tracingCompleteListener);
+      }
+    },
+  );
 
   // Stop tracing and collect the trace data
   await chrome.debugger.sendCommand({ tabId: tabId }, "Tracing.end");
-
-  await waitForTracingComplete(tabId);
-
-  // This will only get executed if the debugger gets attached by the user.
-  // TODO: We might need to move this to start actually.
-  chrome.debugger.onDetach.addListener(async (source, reason) => {
-    console.log("canova ondetach listener");
-    onDetach(traceEvents);
-  });
-
-  // Detach the debugger
-  await chrome.debugger.detach({ tabId: tabId });
-  onDetach(traceEvents);
 }
 
-async function onDetach(traceEvents) {
-  console.log("on detach");
-  // Convert the trace data into JSON
-  const traceData = { traceEvents };
+async function readStreamAsync(tabId, streamHandle) {
+  let profileChunks = [];
 
-  // Open profiler.firefox.com and send the trace data
-  const jsonProfile = JSON.stringify(traceData);
+  try {
+    let eof = false;
+    while (!eof) {
+      const response = await asyncReadStream(tabId, streamHandle);
 
-  // console.log("canova profile.length", jsonProfile.length);
-  await openProfile(jsonProfile);
+      if (response.base64Encoded) {
+        profileChunks.push(atob(response.data));
+      } else {
+        profileChunks.push(response.data);
+      }
 
-  state.reset();
+      eof = response.eof;
+    }
+
+    return profileChunks;
+  } catch (error) {
+    console.error("Error reading the stream:", error);
+    return null;
+  }
 }
 
-// Function to wait for Tracing.tracingComplete event
-function waitForTracingComplete(tabId) {
-  console.log("waiting for tracing to complete");
-  return new Promise((resolve) => {
-    chrome.debugger.onEvent.addListener(
-      function tracingCompleteListener(debuggeeId, message, params) {
-        if (
-          debuggeeId.tabId === tabId &&
-          message === "Tracing.tracingComplete"
-        ) {
-          console.log("done waiting for tracing data.");
-          // Remove the listener after receiving Tracing.tracingComplete
-          chrome.debugger.onEvent.removeListener(tracingCompleteListener);
-          resolve(); // Resolve the promise when tracing is complete
+function asyncReadStream(tabId, streamHandle) {
+  return new Promise((resolve, reject) => {
+    chrome.debugger.sendCommand(
+      { tabId: tabId },
+      "IO.read",
+      { handle: streamHandle },
+      (response) => {
+        if (chrome.runtime.lastError) {
+          reject(chrome.runtime.lastError);
+        } else {
+          resolve(response);
         }
       },
     );
@@ -168,8 +175,10 @@ function waitForTracingComplete(tabId) {
 /**
  * Open a profile in https://profiler.firefox.com/
  */
-async function openProfile(profile) {
+async function openProfile(profileChunks) {
   // const origin = "https://profiler.firefox.com";
+  // FIXME: Currently using localhost since I'm waiting for:
+  // https://github.com/firefox-devtools/profiler/pull/5148
   const origin = "http://localhost:4242";
   const profilerURL = origin + "/from-post-message/";
 
@@ -186,42 +195,79 @@ async function openProfile(profile) {
           }
           startedLoading = true;
           console.log("on load complete", newTabId);
-          await chrome.scripting.executeScript({
-            target: { tabId: newTabId },
-            func: async (profile) => {
-              // const jsonProfile = JSON.stringify(profile);
-              console.log("executing the content script");
-              let isReady = false;
 
-              /**
-               * @param {MessageEvent} event
-               */
-              const listener = ({ data }) => {
-                if (data?.name === "ready") {
-                  isReady = true;
-                  const message = {
-                    name: "inject-profile",
-                    profile: profile,
-                  };
-                  window.postMessage(message, origin);
-                  window.removeEventListener("message", listener);
+          let chunkIndex = 0;
+          const totalChunks = profileChunks.length;
+
+          async function sendNextChunk() {
+            const chunk = profileChunks[chunkIndex];
+
+            await chrome.scripting.executeScript({
+              target: { tabId: newTabId },
+              func: (chunk, chunkIndex, totalChunks) => {
+                // Initialize a global array in the content script if it doesn't exist
+                if (!window.receivedProfileChunks) {
+                  window.receivedProfileChunks = [];
                 }
-              };
 
-              window.addEventListener("message", listener);
-              while (!isReady) {
-                await new Promise((resolve) => setTimeout(resolve, 100));
-                window.postMessage({ name: "is-ready" }, origin);
-              }
+                // Add the received chunk to the array
+                window.receivedProfileChunks.push(chunk);
 
-              console.log("done injecting the profile");
+                console.log(`Received chunk ${chunkIndex + 1}/${totalChunks}`);
 
-              window.removeEventListener("message", listener);
-            },
-            args: [profile],
-            injectImmediately: true,
-            // world: "MAIN",
-          });
+                // If all chunks are received, assemble the profile and send it
+                if (window.receivedProfileChunks.length === totalChunks) {
+                  const fullProfile = window.receivedProfileChunks.join("");
+
+                  let isReady = false;
+
+                  /**
+                   * @param {MessageEvent} event
+                   */
+                  const listener = ({ data }) => {
+                    if (data?.name === "ready") {
+                      isReady = true;
+                      const message = {
+                        name: "inject-profile",
+                        profile: fullProfile,
+                      };
+                      window.postMessage(message, origin);
+                      window.removeEventListener("message", listener);
+                    }
+                  };
+
+                  window.addEventListener("message", listener);
+
+                  async function waitForReady() {
+                    while (!isReady) {
+                      await new Promise((resolve) => setTimeout(resolve, 100));
+                      window.postMessage({ name: "is-ready" }, origin);
+                    }
+
+                    console.log("done injecting the profile");
+                    window.removeEventListener("message", listener);
+                    // Clean up the chunks after sending the full profile
+                    delete window.receivedProfileChunks;
+                  }
+
+                  waitForReady();
+                }
+              },
+              args: [chunk, chunkIndex, totalChunks],
+              injectImmediately: true,
+            });
+
+            chunkIndex++;
+
+            // If there are more chunks, send the next one
+            if (chunkIndex < totalChunks) {
+              setTimeout(sendNextChunk, 50); // Small delay between chunks
+            } else {
+              console.log("All chunks sent!");
+            }
+          }
+
+          sendNextChunk();
           chrome.tabs.onUpdated.removeListener(listener);
         }
       },
