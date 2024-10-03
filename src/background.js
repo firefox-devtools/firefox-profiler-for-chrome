@@ -5,6 +5,7 @@
 // @ts-check
 
 import { state } from "./state.js";
+import { isTabAllowedToProfile } from "./permissions.js";
 
 /**
  * @typedef {object} CustomWindowObject
@@ -258,24 +259,4 @@ async function openProfile(profileChunks) {
       },
     );
   });
-}
-
-function isTabAllowedToProfile(tab) {
-  if (!tab.url?.startsWith("chrome://")) {
-    // It's not a privileged page.
-    return true;
-  }
-
-  // We are not allowed in a privileged page, warn the user and return false.
-  const notificationId = "firefox-profiler-not-allowed" + Math.random();
-  const options = {
-    /** @type {chrome.notifications.TemplateType} */
-    type: "basic",
-    iconUrl: "icons/off/icon128.png",
-    title: "Firefox Profiler Error",
-    message: "Profiling a priviledged page is not allowed.",
-  };
-
-  chrome.notifications.create(notificationId, options, () => {});
-  return false;
 }
