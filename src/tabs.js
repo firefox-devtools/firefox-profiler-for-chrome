@@ -4,6 +4,10 @@
 
 // @ts-check
 
+/**
+ * Get the current tab
+ * @returns {Promise<chrome.tabs.Tab?>}
+ */
 export async function getCurrentTab() {
   // `tab` will either be a `tabs.Tab` instance or `undefined`.
   const [tab] = await chrome.tabs.query({

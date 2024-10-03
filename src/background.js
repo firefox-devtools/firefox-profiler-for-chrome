@@ -28,6 +28,11 @@ chrome.commands.onCommand.addListener(async (command) => {
   console.log(`Command: ${command}`);
 
   const tab = await getCurrentTab();
+  if (!tab) {
+    console.error("Failed to find the current tab");
+    return;
+  }
+
   if (!isTabAllowedToProfile(tab)) {
     return;
   }
