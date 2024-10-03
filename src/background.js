@@ -8,15 +8,6 @@ import { state } from "./state.js";
 import { isTabAllowedToProfile } from "./permissions.js";
 import { startTracing, stopTracingAndCollect } from "./tracing.js";
 
-/**
- * @typedef {object} CustomWindowObject
- * @property {Array<any>} [receivedProfileChunks]
- */
-
-/**
- * @typedef {Window & CustomWindowObject} CustomWindow
- */
-
 chrome.action.onClicked.addListener(async (tab) => {
   if (!isTabAllowedToProfile(tab)) {
     return;
