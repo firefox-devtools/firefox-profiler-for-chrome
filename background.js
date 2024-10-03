@@ -34,37 +34,14 @@ const state = {
 
   reset() {
     // Reset the state
-    chrome.action.setIcon({
-      path: {
-        16: "icons/off/icon16.png",
-        32: "icons/off/icon32.png",
-        48: "icons/off/icon48.png",
-        128: "icons/off/icon128.png",
-      },
-      tabId: this.tabId,
-    });
+    setIcons("off", this.tabId);
     this.isTracing = false;
     this.tabId = null;
-    this.traceEvents = [];
   },
 };
 
 chrome.action.onClicked.addListener(async (tab) => {
-  if (tab.url?.startsWith("chrome://")) {
-    // We are not allowed in a privileged page.
-    const notificationId = "firefox-profiler-not-allowed" + Math.random();
-    const options = {
-      /** @type {chrome.notifications.TemplateType} */
-      type: "basic",
-      iconUrl: "icons/off/icon128.png",
-      title: "Firefox Profiler Error",
-      message: "Profiling priviledged page is not allowed.",
-    };
-
-    const callback = (notificationId) =>
-      console.log("notificationId: ", notificationId);
-
-    chrome.notifications.create(notificationId, options, callback);
+  if (!isTabAllowedToProfile(tab)) {
     return;
   }
 
@@ -306,6 +283,26 @@ async function openProfile(profileChunks) {
       },
     );
   });
+}
+
+function isTabAllowedToProfile(tab) {
+  if (!tab.url?.startsWith("chrome://")) {
+    // It's not a privileged page.
+    return true;
+  }
+
+  // We are not allowed in a privileged page, warn the user and return false.
+  const notificationId = "firefox-profiler-not-allowed" + Math.random();
+  const options = {
+    /** @type {chrome.notifications.TemplateType} */
+    type: "basic",
+    iconUrl: "icons/off/icon128.png",
+    title: "Firefox Profiler Error",
+    message: "Profiling a priviledged page is not allowed.",
+  };
+
+  chrome.notifications.create(notificationId, options, () => {});
+  return false;
 }
 
 /**
