@@ -7,12 +7,15 @@
   "scripts": {
     "lint": "eslint *.js",
     "prettier": "prettier . --check",
-    "prettier-fix": "prettier . --write"
+    "prettier-fix": "prettier . --write",
+    "ts": "tsc"
   },
   "devDependencies": {
     "@eslint/js": "^9.11.1",
+    "@types/chrome": "^0.0.276",
     "eslint": "^9.11.1",
     "globals": "^15.9.0",
-    "prettier": "3.3.3"
+    "prettier": "3.3.3",
+    "typescript": "^5.6.2"
   }
 }

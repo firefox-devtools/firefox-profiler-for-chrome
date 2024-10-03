@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "module": "commonjs",
+    // Make the type checking as strict as possible.
+    "strict": false,
+    // Allow esnext syntax. Otherwise the default is ES5 only.
+    "target": "esnext",
+    "lib": ["esnext", "dom"],
+    "noEmit": true,
+    // Emit additional JavaScript to ease support for importing CommonJS modules.
+    // This enables 'allowSyntheticDefaultImports' for type compatibility.
+    "esModuleInterop": true,
+    // TypeScript will check JS files only if they have a @ts-check comment in them.
+    "allowJs": true,
+    "resolveJsonModule": true
+  },
+  "include": ["./**/*.js"],
+  "exclude": ["node_modules"]
+}

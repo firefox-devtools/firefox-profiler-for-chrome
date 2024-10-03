@@ -1,18 +1,35 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+// @ts-check
+
+/**
+ * @typedef {object} CustomWindowObject
+ * @property {Array<any>} [receivedProfileChunks]
+ */
+
+/**
+ * @typedef {Window & CustomWindowObject} CustomWindow
+ */
+
 const state = {
+  /**
+   * Tracing state.
+   * @type {boolean}
+   * @public
+   */
   isTracing: false,
+  /**
+   * Tab ID of the current profiled tab.
+   * @type {number | null}
+   * @public
+   */
   tabId: null,
 
   startTracing() {
     this.isTracing = true;
-    chrome.action.setIcon({
-      path: {
-        16: "icons/on/icon16.png",
-        32: "icons/on/icon32.png",
-        48: "icons/on/icon48.png",
-        128: "icons/on/icon128.png",
-      },
-      tabId: this.tabId,
-    });
+    setIcons("on", this.tabId);
   },
 
   reset() {
@@ -37,9 +54,10 @@ chrome.action.onClicked.addListener(async (tab) => {
     // We are not allowed in a privileged page.
     const notificationId = "firefox-profiler-not-allowed" + Math.random();
     const options = {
+      /** @type {chrome.notifications.TemplateType} */
       type: "basic",
       iconUrl: "icons/off/icon128.png",
-      title: "Oops",
+      title: "Firefox Profiler Error",
       message: "Profiling priviledged page is not allowed.",
     };
 
@@ -93,7 +111,7 @@ async function startTracing() {
     transferMode: "ReturnAsStream",
   });
 
-  state.startTracing(tabId);
+  state.startTracing();
 }
 
 async function stopTracingAndCollect() {
@@ -102,6 +120,9 @@ async function stopTracingAndCollect() {
 
   // Add the event listener first and then stop the tracing.
   chrome.debugger.onEvent.addListener(
+    /**
+     * @param {{stream?: string}} params
+     */
     async function tracingCompleteListener(debuggeeId, message, params) {
       if (message === "Tracing.tracingComplete") {
         console.log("done waiting for tracing data.");
@@ -174,6 +195,7 @@ function asyncReadStream(tabId, streamHandle) {
 
 /**
  * Open a profile in https://profiler.firefox.com/
+ * @param {Array<string>} profileChunks
  */
 async function openProfile(profileChunks) {
   // const origin = "https://profiler.firefox.com";
@@ -196,6 +218,7 @@ async function openProfile(profileChunks) {
           startedLoading = true;
           console.log("on load complete", newTabId);
 
+          /** @type {number} */
           let chunkIndex = 0;
           const totalChunks = profileChunks.length;
 
@@ -204,20 +227,30 @@ async function openProfile(profileChunks) {
 
             await chrome.scripting.executeScript({
               target: { tabId: newTabId },
+              /**
+               * @param {string} chunk
+               * @param {number} chunkIndex
+               * @param {number} totalChunks
+               */
               func: (chunk, chunkIndex, totalChunks) => {
                 // Initialize a global array in the content script if it doesn't exist
-                if (!window.receivedProfileChunks) {
-                  window.receivedProfileChunks = [];
+                // NOTE: We have to cast the Window into CustomWindow to be able
+                // to use the new field we add in typescript.
+                /** @type {CustomWindow} */
+                const customWindow = window;
+                if (!customWindow.receivedProfileChunks) {
+                  customWindow.receivedProfileChunks = [];
                 }
 
                 // Add the received chunk to the array
-                window.receivedProfileChunks.push(chunk);
+                customWindow.receivedProfileChunks.push(chunk);
 
                 console.log(`Received chunk ${chunkIndex + 1}/${totalChunks}`);
 
                 // If all chunks are received, assemble the profile and send it
-                if (window.receivedProfileChunks.length === totalChunks) {
-                  const fullProfile = window.receivedProfileChunks.join("");
+                if (customWindow.receivedProfileChunks.length === totalChunks) {
+                  const fullProfile =
+                    customWindow.receivedProfileChunks.join("");
 
                   let isReady = false;
 
@@ -231,23 +264,23 @@ async function openProfile(profileChunks) {
                         name: "inject-profile",
                         profile: fullProfile,
                       };
-                      window.postMessage(message, origin);
-                      window.removeEventListener("message", listener);
+                      customWindow.postMessage(message, origin);
+                      customWindow.removeEventListener("message", listener);
                     }
                   };
 
-                  window.addEventListener("message", listener);
+                  customWindow.addEventListener("message", listener);
 
                   async function waitForReady() {
                     while (!isReady) {
                       await new Promise((resolve) => setTimeout(resolve, 100));
-                      window.postMessage({ name: "is-ready" }, origin);
+                      customWindow.postMessage({ name: "is-ready" }, origin);
                     }
 
                     console.log("done injecting the profile");
-                    window.removeEventListener("message", listener);
+                    customWindow.removeEventListener("message", listener);
                     // Clean up the chunks after sending the full profile
-                    delete window.receivedProfileChunks;
+                    delete customWindow.receivedProfileChunks;
                   }
 
                   waitForReady();
@@ -272,5 +305,22 @@ async function openProfile(profileChunks) {
         }
       },
     );
+  });
+}
+
+/**
+ * Sets the icon of the extension
+ * @param {"on" | "off"} variant
+ * @param {number} tabId
+ */
+function setIcons(variant, tabId) {
+  chrome.action.setIcon({
+    path: {
+      16: `icons/${variant}/icon16.png`,
+      32: `icons/${variant}/icon32.png`,
+      48: `icons/${variant}/icon48.png`,
+      128: `icons/${variant}/icon128.png`,
+    },
+    tabId,
   });
 }
