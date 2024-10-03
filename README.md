@@ -15,6 +15,18 @@ both browsers.
 - Click "Load unpacked" and select the extension folder.
 - Once loaded, the extension icon should appear in your Chrome toolbar.
 
+## Development
+
+Currently there is no bunlder in the project for faster development. But we do
+rely on [TypeScript using JSDocs](https://www.typescriptlang.org/docs/handbook/jsdoc-supported-types.html)
+and we have `eslint` and `prettier` to ensure basic code formatting and linting
+standards are consistently applied across the codebase.
+
+Run `yarn` or `yarn install` for installing the development dependencies.
+
+After your changes, please make sure to have successful `yarn ts`, `yarn lint`,
+and `yarn prettier` results.
+
 ## Note
 
 It's still Work in progress. Also, currently it requires a patched Firefox
