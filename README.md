@@ -7,7 +7,7 @@ integrating Chrome's tracing features with the Firefox Profiler, it simplifies
 performance diagnostics, making it easier to analyze and compare results across
 both browsers.
 
-## How to install it
+## How to install
 
 - Clone the repository.
 - Navigate to `chrome://extensions/` and enable the developer mode on the top
@@ -17,6 +17,7 @@ both browsers.
 
 ## Note
 
-Currently it requires a patched Firefox Profiler, that's why you need to clone
-it and pull [this PR](https://github.com/firefox-devtools/profiler/pull/5148)
-to be able to use it.
+It's still Work in progress. Also, currently it requires a patched Firefox
+Profiler frontend, that's why you need to clone it and pull
+[this PR](https://github.com/firefox-devtools/profiler/pull/5148) to be able
+to use it.
