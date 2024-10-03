@@ -4,6 +4,15 @@
 
 // @ts-check
 
+export async function getCurrentTab() {
+  // `tab` will either be a `tabs.Tab` instance or `undefined`.
+  const [tab] = await chrome.tabs.query({
+    active: true,
+    lastFocusedWindow: true,
+  });
+  return tab;
+}
+
 export function isTabAllowedToProfile(tab) {
   if (!tab.url?.startsWith("chrome://")) {
     // It's not a privileged page.

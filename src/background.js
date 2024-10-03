@@ -5,7 +5,7 @@
 // @ts-check
 
 import { state } from "./state.js";
-import { isTabAllowedToProfile } from "./permissions.js";
+import { isTabAllowedToProfile, getCurrentTab } from "./tabs.js";
 import { startTracing, stopTracingAndCollect, stopTracing } from "./tracing.js";
 
 chrome.action.onClicked.addListener(async (tab) => {
@@ -55,12 +55,3 @@ chrome.commands.onCommand.addListener(async (command) => {
       console.error(`Unrecognized command: ${command}`);
   }
 });
-
-async function getCurrentTab() {
-  // `tab` will either be a `tabs.Tab` instance or `undefined`.
-  const [tab] = await chrome.tabs.query({
-    active: true,
-    lastFocusedWindow: true,
-  });
-  return tab;
-}
