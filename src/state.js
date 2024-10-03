@@ -20,12 +20,12 @@ export const state = {
 
   startTracing() {
     this.isTracing = true;
-    setIcons("on", this.tabId);
+    setIcons("on");
   },
 
   reset() {
     // Reset the state
-    setIcons("off", this.tabId);
+    setIcons("off");
     this.isTracing = false;
     this.tabId = null;
   },
@@ -34,9 +34,8 @@ export const state = {
 /**
  * Sets the icon of the extension
  * @param {"on" | "off"} variant
- * @param {number} tabId
  */
-function setIcons(variant, tabId) {
+function setIcons(variant) {
   chrome.action.setIcon({
     path: {
       16: chrome.runtime.getURL(`icons/${variant}/icon16.png`),
