@@ -14,7 +14,8 @@
     "http://localhost:4242/*"
   ],
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "src/background.js",
+    "type": "module"
   },
   "action": {
     "default_icon": {

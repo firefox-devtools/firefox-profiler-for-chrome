@@ -5,7 +5,7 @@
   "author": "Nazım Can Altınova <canaltinova@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "lint": "eslint *.js",
+    "lint": "eslint **/*.js",
     "prettier": "prettier . --check",
     "prettier-fix": "prettier . --write",
     "ts": "tsc"
