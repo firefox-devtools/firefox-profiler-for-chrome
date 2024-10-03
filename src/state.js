@@ -44,6 +44,5 @@ function setIcons(variant, tabId) {
       48: chrome.runtime.getURL(`icons/${variant}/icon48.png`),
       128: chrome.runtime.getURL(`icons/${variant}/icon128.png`),
     },
-    tabId,
   });
 }
