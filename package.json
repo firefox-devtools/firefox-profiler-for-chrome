@@ -8,13 +8,15 @@
     "lint": "eslint **/*.js",
     "prettier": "prettier . --check",
     "prettier-fix": "prettier . --write",
-    "ts": "tsc"
+    "ts": "tsc",
+    "test-all": "run-p lint prettier ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.11.1",
     "@types/chrome": "^0.0.276",
     "eslint": "^9.11.1",
     "globals": "^15.9.0",
+    "npm-run-all": "^4.1.5",
     "prettier": "3.3.3",
     "typescript": "^5.6.2"
   }

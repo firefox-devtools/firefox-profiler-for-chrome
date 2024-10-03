@@ -27,6 +27,8 @@ Run `yarn` or `yarn install` for installing the development dependencies.
 After your changes, please make sure to have successful `yarn ts`, `yarn lint`,
 and `yarn prettier` results.
 
+Alternatively you can run `yarn test-all` to run all of them.
+
 ## Note
 
 It's still Work in progress. Also, currently it requires a patched Firefox
