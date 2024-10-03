@@ -15,7 +15,7 @@ export function isTabAllowedToProfile(tab) {
   const options = {
     /** @type {chrome.notifications.TemplateType} */
     type: "basic",
-    iconUrl: "icons/off/icon128.png",
+    iconUrl: chrome.runtime.getURL("icons/off/icon128.png"),
     title: "Firefox Profiler Error",
     message: "Profiling a priviledged page is not allowed.",
   };

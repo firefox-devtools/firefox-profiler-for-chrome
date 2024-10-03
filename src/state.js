@@ -39,10 +39,10 @@ export const state = {
 function setIcons(variant, tabId) {
   chrome.action.setIcon({
     path: {
-      16: `../icons/${variant}/icon16.png`,
-      32: `../icons/${variant}/icon32.png`,
-      48: `../icons/${variant}/icon48.png`,
-      128: `../icons/${variant}/icon128.png`,
+      16: chrome.runtime.getURL(`icons/${variant}/icon16.png`),
+      32: chrome.runtime.getURL(`icons/${variant}/icon32.png`),
+      48: chrome.runtime.getURL(`icons/${variant}/icon48.png`),
+      128: chrome.runtime.getURL(`icons/${variant}/icon128.png`),
     },
     tabId,
   });
