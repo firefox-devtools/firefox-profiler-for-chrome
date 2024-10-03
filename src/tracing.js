@@ -88,6 +88,18 @@ export async function stopTracingAndCollect() {
   await chrome.debugger.sendCommand({ tabId: tabId }, "Tracing.end");
 }
 
+export async function stopTracing() {
+  console.log("stop tracing and open the profile");
+  const { tabId } = state;
+
+  // Stop tracing without collecting the trace.
+  await chrome.debugger.sendCommand({ tabId: tabId }, "Tracing.end");
+  chrome.debugger.detach({ tabId }, () => {
+    console.log("Debugger detached");
+  });
+  state.reset();
+}
+
 async function readStreamAsync(tabId, streamHandle) {
   let profileChunks = [];
 
