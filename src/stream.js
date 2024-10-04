@@ -37,12 +37,19 @@ export async function readStreamAsync(tabId, streamHandle) {
 }
 
 /**
+ * @typedef {Object} IOStreamResponse - Return value of the "IO.read" command.
+ * @property {string} data
+ * @property {boolean} eof
+ * @property {boolean} [base64Encoded]
+ */
+
+/**
  *
  * Read a chunk of the IO stream.
  *
  * @param {number} tabId
  * @param {string} streamHandle
- * @returns {Promise<{data: string, eof: boolean, base64Encoded?: boolean}>}
+ * @returns {Promise<IOStreamResponse >}
  */
 function asyncReadDebuggerIOStream(tabId, streamHandle) {
   return new Promise((resolve, reject) => {
@@ -50,7 +57,7 @@ function asyncReadDebuggerIOStream(tabId, streamHandle) {
       { tabId: tabId },
       "IO.read",
       { handle: streamHandle },
-      /** @param {any} response */
+      /** @param {IOStreamResponse } response */
       (response) => {
         if (chrome.runtime.lastError) {
           reject(chrome.runtime.lastError);
