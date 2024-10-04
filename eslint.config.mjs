@@ -6,7 +6,7 @@ export default [
     languageOptions: {
       globals: {
         ...globals.browser,
-        chrome: "readonly",
+        ...globals.webextensions,
       },
     },
   },
