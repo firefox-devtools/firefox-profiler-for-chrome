@@ -28,6 +28,8 @@ const PROFILER_URL = origin + "/from-post-message/";
  * TODO: Currently it uses default puppeteer categories, but we should match
  * what Chrome devtools does. We chould also create a settings page like the
  * devtools performance panel.
+ *
+ * @returns {Promise<void>}
  */
 export async function startTracing() {
   console.log("Start tracing");
@@ -77,6 +79,8 @@ export async function startTracing() {
 /**
  * Stop tracing and collect the tracing data. It opens up a new tab and loads
  * the Firefox Profiler.
+ *
+ * @returns {Promise<void>}
  */
 export async function stopTracingAndCollect() {
   console.log("Stop tracing and open the profile");
@@ -116,6 +120,12 @@ export async function stopTracingAndCollect() {
   await chrome.debugger.sendCommand({ tabId: tabId }, "Tracing.end");
 }
 
+/**
+ *
+ * Stop tracing and discard the tracing data.
+ *
+ * @returns {Promise<void>}
+ */
 export async function stopTracing() {
   console.log("Stop tracing");
   const { tabId } = state;
@@ -138,6 +148,7 @@ export async function stopTracing() {
  * successfully.
  *
  * @param {Array<string>} profileChunks
+ * @returns {Promise<void>}
  */
 async function openProfile(profileChunks) {
   chrome.tabs.create({ url: PROFILER_URL }, async (newTab) => {
@@ -158,6 +169,13 @@ async function openProfile(profileChunks) {
           let chunkIndex = 0;
           const totalChunks = profileChunks.length;
 
+          /**
+           * Send the next chunk using chrome.scripting.executeScript API.
+           * The reason why we have to send by chunks is that the aforementioned
+           * API fails silently if we pass a longer string.
+           *
+           * @returns Promise<void>
+           */
           async function sendNextChunk() {
             const chunk = profileChunks[chunkIndex];
 
@@ -207,6 +225,13 @@ async function openProfile(profileChunks) {
 
                   customWindow.addEventListener("message", listener);
 
+                  /**
+                   * Wait for profiler frontend to be ready before sending the
+                   * full profile. The listener above will get called with
+                   * the 'ready' as a response to 'is-ready'.
+                   *
+                   * @returns {Promise<void>}
+                   */
                   async function waitForReady() {
                     while (!isReady) {
                       await new Promise((resolve) => setTimeout(resolve, 100));

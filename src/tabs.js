@@ -18,10 +18,10 @@ export async function getCurrentTab() {
 }
 
 /**
- * Check if the tab is allowed to be profiled and show a notification if not.
+ * Check if the tab is allowed to be attached and show a notification if not.
  * Chrome privileged pages are not allowed.
  */
-export function isTabAllowedToProfile(tab) {
+export function isTabAllowedToAttach(tab) {
   if (
     !tab.url?.startsWith("chrome://") &&
     !tab.url?.startsWith("chrome-extension://")
@@ -31,14 +31,14 @@ export function isTabAllowedToProfile(tab) {
   }
 
   // We are not allowed in a privileged page, warn the user and return false.
-  console.warn("Tab is not allowed to profile");
+  console.warn("Tab is not allowed to trace");
   const notificationId = "firefox-profiler-not-allowed" + Math.random();
   const options = {
     /** @type {chrome.notifications.TemplateType} */
     type: "basic",
     iconUrl: chrome.runtime.getURL("icons/off/icon128.png"),
     title: "Firefox Profiler Error",
-    message: "Profiling a priviledged page is not allowed.",
+    message: "Tracing a privileged page is not allowed.",
   };
 
   chrome.notifications.create(notificationId, options, () => {});

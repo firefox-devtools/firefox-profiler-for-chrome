@@ -5,14 +5,14 @@
 // @ts-check
 
 import { state } from "./state.js";
-import { isTabAllowedToProfile, getCurrentTab } from "./tabs.js";
+import { isTabAllowedToAttach, getCurrentTab } from "./tabs.js";
 import { startTracing, stopTracingAndCollect, stopTracing } from "./tracing.js";
 
 /**
  * onClick listener for the extension toolbar button.
  */
 chrome.action.onClicked.addListener(async (tab) => {
-  if (!isTabAllowedToProfile(tab)) {
+  if (!isTabAllowedToAttach(tab)) {
     return;
   }
 
@@ -39,7 +39,7 @@ chrome.commands.onCommand.addListener(async (command) => {
     return;
   }
 
-  if (!isTabAllowedToProfile(tab)) {
+  if (!isTabAllowedToAttach(tab)) {
     return;
   }
 

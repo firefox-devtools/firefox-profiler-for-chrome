@@ -12,7 +12,7 @@ export const state = {
    */
   isTracing: false,
   /**
-   * Tab ID of the current profiled tab.
+   * Tab ID of the current traced tab.
    * @type {number | null}
    * @public
    */
