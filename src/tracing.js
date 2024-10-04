@@ -20,7 +20,7 @@ import { readStreamAsync } from "./stream.js";
 // https://github.com/firefox-devtools/profiler/pull/5148
 // const PROFILER_ORIGIN = "https://profiler.firefox.com";
 const PROFILER_ORIGIN = "http://localhost:4242";
-const PROFILER_URL = origin + "/from-post-message/";
+const PROFILER_URL = PROFILER_ORIGIN + "/from-post-message/";
 
 /**
  * Start tracing the current tab.
