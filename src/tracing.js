@@ -185,8 +185,9 @@ async function openProfile(profileChunks) {
                * @param {string} chunk
                * @param {number} chunkIndex
                * @param {number} totalChunks
+               * @param {string} profilerOrigin
                */
-              func: (chunk, chunkIndex, totalChunks) => {
+              func: (chunk, chunkIndex, totalChunks, profilerOrigin) => {
                 // Initialize a global array in the content script if it doesn't exist
                 // NOTE: We have to cast the Window into CustomWindow to be able
                 // to use the new field we add in typescript.
@@ -218,7 +219,7 @@ async function openProfile(profileChunks) {
                         name: "inject-profile",
                         profile: fullProfile,
                       };
-                      customWindow.postMessage(message, PROFILER_ORIGIN);
+                      customWindow.postMessage(message, profilerOrigin);
                       customWindow.removeEventListener("message", listener);
                     }
                   };
@@ -237,7 +238,7 @@ async function openProfile(profileChunks) {
                       await new Promise((resolve) => setTimeout(resolve, 100));
                       customWindow.postMessage(
                         { name: "is-ready" },
-                        PROFILER_ORIGIN,
+                        profilerOrigin,
                       );
                     }
 
@@ -250,7 +251,7 @@ async function openProfile(profileChunks) {
                   waitForReady();
                 }
               },
-              args: [chunk, chunkIndex, totalChunks],
+              args: [chunk, chunkIndex, totalChunks, PROFILER_ORIGIN],
               injectImmediately: true,
             });
 
