@@ -16,6 +16,12 @@ import { readStreamAsync } from "./stream.js";
  * @typedef {Window & CustomWindowObject} CustomWindow
  */
 
+// FIXME: Use the production url once this PR is merged:
+// https://github.com/firefox-devtools/profiler/pull/5148
+// const PROFILER_ORIGIN = "https://profiler.firefox.com";
+const PROFILER_ORIGIN = "http://localhost:4242";
+const PROFILER_URL = origin + "/from-post-message/";
+
 /**
  * Start tracing the current tab.
  *
@@ -134,13 +140,7 @@ export async function stopTracing() {
  * @param {Array<string>} profileChunks
  */
 async function openProfile(profileChunks) {
-  // const origin = "https://profiler.firefox.com";
-  // FIXME: Currently using localhost since I'm waiting for:
-  // https://github.com/firefox-devtools/profiler/pull/5148
-  const origin = "http://localhost:4242";
-  const profilerURL = origin + "/from-post-message/";
-
-  chrome.tabs.create({ url: profilerURL }, async (newTab) => {
+  chrome.tabs.create({ url: PROFILER_URL }, async (newTab) => {
     const newTabId = newTab.id;
 
     let startedLoading = false;
@@ -200,7 +200,7 @@ async function openProfile(profileChunks) {
                         name: "inject-profile",
                         profile: fullProfile,
                       };
-                      customWindow.postMessage(message, origin);
+                      customWindow.postMessage(message, PROFILER_ORIGIN);
                       customWindow.removeEventListener("message", listener);
                     }
                   };
@@ -210,7 +210,10 @@ async function openProfile(profileChunks) {
                   async function waitForReady() {
                     while (!isReady) {
                       await new Promise((resolve) => setTimeout(resolve, 100));
-                      customWindow.postMessage({ name: "is-ready" }, origin);
+                      customWindow.postMessage(
+                        { name: "is-ready" },
+                        PROFILER_ORIGIN,
+                      );
                     }
 
                     console.log("Done injecting the profile");
