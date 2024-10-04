@@ -8,15 +8,22 @@ import { state } from "./state.js";
 
 /**
  * @typedef {object} CustomWindowObject
- * @property {Array<any>} [receivedProfileChunks]
+ * @property {Array<string>} [receivedProfileChunks]
  */
 
 /**
  * @typedef {Window & CustomWindowObject} CustomWindow
  */
 
+/**
+ * Start tracing the current tab.
+ *
+ * TODO: Currently it uses default puppeteer categories, but we should match
+ * what Chrome devtools does. We chould also create a settings page like the
+ * devtools performance panel.
+ */
 export async function startTracing() {
-  console.log("start tracing");
+  console.log("Start tracing");
   const { tabId } = state;
   await chrome.debugger.attach({ tabId: tabId }, "1.3");
 
@@ -49,10 +56,23 @@ export async function startTracing() {
   });
 
   state.startTracing();
+
+  chrome.debugger.onDetach.addListener(() => {
+    console.log("Debugger onDetach listener");
+
+    // Users might detach the debugger using the "cancel" button on the debugger
+    // toolbar instead of the profiler button or keyboard shortcut.
+    // We should reset the state.
+    state.reset();
+  });
 }
 
+/**
+ * Stop tracing and collect the tracing data. It opens up a new tab and loads
+ * the Firefox Profiler.
+ */
 export async function stopTracingAndCollect() {
-  console.log("stop tracing and open the profile");
+  console.log("Stop tracing and open the profile");
   const { tabId } = state;
 
   // Add the event listener first and then stop the tracing.
@@ -90,7 +110,7 @@ export async function stopTracingAndCollect() {
 }
 
 export async function stopTracing() {
-  console.log("stop tracing and open the profile");
+  console.log("Stop tracing");
   const { tabId } = state;
 
   // Stop tracing without collecting the trace.
@@ -172,7 +192,7 @@ async function openProfile(profileChunks) {
             return;
           }
           startedLoading = true;
-          console.log("on load complete", newTabId);
+          console.log("On load complete");
 
           /** @type {number} */
           let chunkIndex = 0;
@@ -233,7 +253,7 @@ async function openProfile(profileChunks) {
                       customWindow.postMessage({ name: "is-ready" }, origin);
                     }
 
-                    console.log("done injecting the profile");
+                    console.log("Done injecting the profile");
                     customWindow.removeEventListener("message", listener);
                     // Clean up the chunks after sending the full profile
                     delete customWindow.receivedProfileChunks;

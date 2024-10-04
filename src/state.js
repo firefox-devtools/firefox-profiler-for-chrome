@@ -25,9 +25,9 @@ export const state = {
 
   reset() {
     // Reset the state
-    setIcons("off");
     this.isTracing = false;
     this.tabId = null;
+    setIcons("off");
   },
 };
 

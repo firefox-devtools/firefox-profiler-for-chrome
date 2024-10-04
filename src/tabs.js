@@ -31,6 +31,7 @@ export function isTabAllowedToProfile(tab) {
   }
 
   // We are not allowed in a privileged page, warn the user and return false.
+  console.warn("Tab is not allowed to profile");
   const notificationId = "firefox-profiler-not-allowed" + Math.random();
   const options = {
     /** @type {chrome.notifications.TemplateType} */
