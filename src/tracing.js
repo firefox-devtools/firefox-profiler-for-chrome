@@ -5,6 +5,7 @@
 // @ts-check
 
 import { state } from "./state.js";
+import { readStreamAsync } from "./stream.js";
 
 /**
  * @typedef {object} CustomWindowObject
@@ -119,47 +120,6 @@ export async function stopTracing() {
     console.log("Debugger detached");
   });
   state.reset();
-}
-
-async function readStreamAsync(tabId, streamHandle) {
-  let profileChunks = [];
-
-  try {
-    let eof = false;
-    while (!eof) {
-      const response = await asyncReadStream(tabId, streamHandle);
-
-      if (response.base64Encoded) {
-        profileChunks.push(atob(response.data));
-      } else {
-        profileChunks.push(response.data);
-      }
-
-      eof = response.eof;
-    }
-
-    return profileChunks;
-  } catch (error) {
-    console.error("Error reading the stream:", error);
-    return null;
-  }
-}
-
-function asyncReadStream(tabId, streamHandle) {
-  return new Promise((resolve, reject) => {
-    chrome.debugger.sendCommand(
-      { tabId: tabId },
-      "IO.read",
-      { handle: streamHandle },
-      (response) => {
-        if (chrome.runtime.lastError) {
-          reject(chrome.runtime.lastError);
-        } else {
-          resolve(response);
-        }
-      },
-    );
-  });
 }
 
 /**
