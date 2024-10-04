@@ -22,7 +22,10 @@ export async function getCurrentTab() {
  * Chrome privileged pages are not allowed.
  */
 export function isTabAllowedToProfile(tab) {
-  if (!tab.url?.startsWith("chrome://")) {
+  if (
+    !tab.url?.startsWith("chrome://") &&
+    !tab.url?.startsWith("chrome-extension://")
+  ) {
     // It's not a privileged page.
     return true;
   }
