@@ -45,22 +45,29 @@ export async function startTracing() {
   // Define tracing categories
   // The settings used by the devtools can be found here:
   // https://source.chromium.org/chromium/chromium/src/+/main:third_party/devtools-frontend/src/front_end/panels/timeline/TimelineController.ts;l=87-103;drc=a59de5d27b5977b0bb8d260634f1d8d45e69cfdf
-  // and for puppeteer here:
+  // and by puppeteer here:
   // https://github.com/puppeteer/puppeteer/blob/ce1ed7ad74a90acc37f2a5e284ad8d8da360e462/packages/puppeteer-core/src/cdp/Tracing.ts#L72-L84
-  // Currently using puppeteer's categories.
+  // Looks like puppeteer uses fewer categories than the devtools one, trying
+  // to match the devtools here.
   const defaultCategories = [
     "-*",
     "devtools.timeline",
     "v8.execute",
+    "v8",
     "disabled-by-default-devtools.timeline",
     "disabled-by-default-devtools.timeline.frame",
+    "disabled-by-default-devtools.timeline.stack",
     "toplevel",
     "blink.console",
     "blink.user_timing",
+    "loading",
     "latencyInfo",
-    "disabled-by-default-devtools.timeline.stack",
     "disabled-by-default-v8.cpu_profiler",
+    "disabled-by-default-v8.cpu_profiler.hires",
     "disabled-by-default-devtools.screenshot",
+    "lighthouse",
+    "cppgc",
+    "navigation,rail",
   ];
 
   await chrome.debugger.sendCommand({ tabId }, "Tracing.start", {
