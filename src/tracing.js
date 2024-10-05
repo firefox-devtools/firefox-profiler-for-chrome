@@ -91,7 +91,7 @@ export async function stopTracingAndCollect() {
     /**
      * @param {{stream?: string}} params
      */
-    async function tracingCompleteListener(debuggeeId, message, params) {
+    async function tracingCompleteListener(_debuggeeId, message, params) {
       if (message === "Tracing.tracingComplete") {
         console.log("done waiting for tracing data.");
         const streamHandle = params.stream;

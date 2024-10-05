@@ -20,6 +20,8 @@ export async function getCurrentTab() {
 /**
  * Check if the tab is allowed to be attached and show a notification if not.
  * Chrome privileged pages are not allowed.
+ *
+ * @param {chrome.tabs.Tab} tab
  */
 export function isTabAllowedToAttach(tab) {
   if (
