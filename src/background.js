@@ -16,7 +16,7 @@ chrome.action.onClicked.addListener(async (tab) => {
     return;
   }
 
-  if (!state.tabId) {
+  if (!state.tabId && tab.id !== undefined) {
     state.tabId = tab.id;
   }
 
@@ -43,7 +43,7 @@ chrome.commands.onCommand.addListener(async (command) => {
     return;
   }
 
-  if (!state.tabId) {
+  if (!state.tabId && tab.id !== undefined) {
     state.tabId = tab.id;
   }
 

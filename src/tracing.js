@@ -34,7 +34,13 @@ const PROFILER_URL = PROFILER_ORIGIN + "/from-post-message/";
 export async function startTracing() {
   console.log("Start tracing");
   const { tabId } = state;
-  await chrome.debugger.attach({ tabId: tabId }, "1.3");
+
+  if (tabId === null) {
+    console.warn("Failed to get the Tab ID");
+    return;
+  }
+
+  await chrome.debugger.attach({ tabId }, "1.3");
 
   // Define tracing categories
   // The settings used by the devtools can be found here:
@@ -57,7 +63,7 @@ export async function startTracing() {
     "disabled-by-default-devtools.screenshot",
   ];
 
-  await chrome.debugger.sendCommand({ tabId: tabId }, "Tracing.start", {
+  await chrome.debugger.sendCommand({ tabId }, "Tracing.start", {
     traceConfig: {
       includedCategories: defaultCategories,
     },
@@ -85,22 +91,30 @@ export async function startTracing() {
 export async function stopTracingAndCollect() {
   console.log("Stop tracing and open the profile");
   const { tabId } = state;
+  if (tabId === null) {
+    console.warn("Failed to get the Tab ID");
+    return;
+  }
 
   // Add the event listener first and then stop the tracing.
   chrome.debugger.onEvent.addListener(
-    /**
-     * @param {{stream?: string}} params
-     */
     async function tracingCompleteListener(_debuggeeId, message, params) {
       if (message === "Tracing.tracingComplete") {
-        console.log("done waiting for tracing data.");
-        const streamHandle = params.stream;
+        console.log("Done waiting for tracing data");
+        // Casting it from Object to its type
+        const tracingCompleteParams = /** @type {{stream?: string}} */ (params);
+        const streamHandle = tracingCompleteParams.stream;
         if (!streamHandle) {
-          console.warn("Failed to find the stream!");
+          console.warn("Failed to find the stream");
           return;
         }
 
         const profileChunks = await readStreamAsync(tabId, streamHandle);
+
+        if (!profileChunks) {
+          console.warn("Failed to get tracing data chunks");
+          return;
+        }
 
         console.log("Trace data complete, total chunks:", profileChunks.length);
         chrome.debugger.detach({ tabId }, () => {
@@ -117,7 +131,7 @@ export async function stopTracingAndCollect() {
   );
 
   // Stop tracing and collect the trace data
-  await chrome.debugger.sendCommand({ tabId: tabId }, "Tracing.end");
+  await chrome.debugger.sendCommand({ tabId }, "Tracing.end");
 }
 
 /**
@@ -129,9 +143,13 @@ export async function stopTracingAndCollect() {
 export async function stopTracing() {
   console.log("Stop tracing");
   const { tabId } = state;
+  if (tabId === null) {
+    console.warn("Failed to get the Tab ID");
+    return;
+  }
 
   // Stop tracing without collecting the trace.
-  await chrome.debugger.sendCommand({ tabId: tabId }, "Tracing.end");
+  await chrome.debugger.sendCommand({ tabId }, "Tracing.end");
   chrome.debugger.detach({ tabId }, () => {
     console.log("Debugger detached");
   });
@@ -153,6 +171,11 @@ export async function stopTracing() {
 async function openProfile(profileChunks) {
   chrome.tabs.create({ url: PROFILER_URL }, async (newTab) => {
     const newTabId = newTab.id;
+
+    if (newTabId === undefined) {
+      console.warn("Failed to get the Tab ID");
+      return;
+    }
 
     let startedLoading = false;
 
@@ -178,6 +201,11 @@ async function openProfile(profileChunks) {
            */
           async function sendNextChunk() {
             const chunk = profileChunks[chunkIndex];
+
+            if (newTabId === undefined) {
+              console.warn("Failed to get the Tab ID");
+              return;
+            }
 
             await chrome.scripting.executeScript({
               target: { tabId: newTabId },
@@ -261,7 +289,7 @@ async function openProfile(profileChunks) {
             if (chunkIndex < totalChunks) {
               setTimeout(sendNextChunk, 50); // Small delay between chunks
             } else {
-              console.log("All chunks sent!");
+              console.log("All chunks sent");
             }
           }
 

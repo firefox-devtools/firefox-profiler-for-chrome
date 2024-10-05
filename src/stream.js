@@ -10,7 +10,7 @@
  *
  * @param {number} tabId
  * @param {string} streamHandle
- * @returns {Promise<Array<string>>}
+ * @returns {Promise<Array<string> | null>}
  */
 export async function readStreamAsync(tabId, streamHandle) {
   const chunks = [];
@@ -49,7 +49,7 @@ export async function readStreamAsync(tabId, streamHandle) {
  *
  * @param {number} tabId
  * @param {string} streamHandle
- * @returns {Promise<IOStreamResponse >}
+ * @returns {Promise<IOStreamResponse>}
  */
 function asyncReadDebuggerIOStream(tabId, streamHandle) {
   return new Promise((resolve, reject) => {
@@ -57,7 +57,7 @@ function asyncReadDebuggerIOStream(tabId, streamHandle) {
       { tabId: tabId },
       "IO.read",
       { handle: streamHandle },
-      /** @param {IOStreamResponse } response */
+      /** @param {any} response */
       (response) => {
         if (chrome.runtime.lastError) {
           reject(chrome.runtime.lastError);
