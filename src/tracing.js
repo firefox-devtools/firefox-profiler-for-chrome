@@ -19,7 +19,7 @@ import { readStreamAsync } from "./stream.js";
 // FIXME: Use the production url once this PR is merged:
 // https://github.com/firefox-devtools/profiler/pull/5148
 // const PROFILER_ORIGIN = "https://profiler.firefox.com";
-const PROFILER_ORIGIN = "http://localhost:4242";
+const PROFILER_ORIGIN = "https://deploy-preview-5148--perf-html.netlify.app";
 const PROFILER_URL = PROFILER_ORIGIN + "/from-post-message/";
 
 /**

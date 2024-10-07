@@ -32,6 +32,6 @@ Alternatively you can run `yarn test-all` to run all of them.
 ## Important Note
 
 It's still Work in progress. Also, currently it requires a patched Firefox
-Profiler frontend, that's why you need to clone it and pull
-[this PR](https://github.com/firefox-devtools/profiler/pull/5148) to be able
-to use it.
+Profiler frontend, that's why it currently opens up a deploy preview URL.
+Alternatively you can clone the repo and pull [this PR](https://github.com/firefox-devtools/profiler/pull/5148)
+to be able to use localhost.
