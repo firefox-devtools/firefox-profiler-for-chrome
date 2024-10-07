@@ -21,6 +21,7 @@ export const state = {
   startTracing() {
     this.isTracing = true;
     setIcons("on");
+    chrome.action.setTitle({ title: "Click to capture the trace" });
   },
 
   reset() {
@@ -28,6 +29,7 @@ export const state = {
     this.isTracing = false;
     this.tabId = null;
     setIcons("off");
+    chrome.action.setTitle({ title: "Click to start tracing" });
   },
 };
 

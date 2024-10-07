@@ -66,3 +66,8 @@ chrome.commands.onCommand.addListener(async (command) => {
       console.error(`Unrecognized command: ${command}`);
   }
 });
+
+(() => {
+  // Reset the state on the initial extension load.
+  state.reset();
+})();
