@@ -13,7 +13,8 @@ both browsers.
 - Navigate to `chrome://extensions/` and enable the developer mode on the top
   right corner.
 - Click "Load unpacked" and select the extension folder.
-- Once loaded, the extension icon should appear in your Chrome toolbar.
+- Once loaded, the extension icon should appear inside the "Extension" menu on
+  your Chrome toolbar. Click on the "Pin" button to add it to the toolbar directly.
 
 ## Development
 
