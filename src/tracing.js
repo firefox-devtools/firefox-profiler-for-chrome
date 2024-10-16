@@ -248,7 +248,7 @@ async function openProfile(profileChunks) {
                    * @param {MessageEvent} event
                    */
                   const listener = ({ data }) => {
-                    if (data?.name === "ready") {
+                    if (data?.name === "ready:response") {
                       isReady = true;
                       const message = {
                         name: "inject-profile",
@@ -264,7 +264,7 @@ async function openProfile(profileChunks) {
                   /**
                    * Wait for profiler frontend to be ready before sending the
                    * full profile. The listener above will get called with
-                   * the 'ready' as a response to 'is-ready'.
+                   * the 'ready:response' as a response to 'ready:request'.
                    *
                    * @returns {Promise<void>}
                    */
@@ -272,7 +272,7 @@ async function openProfile(profileChunks) {
                     while (!isReady) {
                       await new Promise((resolve) => setTimeout(resolve, 100));
                       customWindow.postMessage(
-                        { name: "is-ready" },
+                        { name: "ready:request" },
                         profilerOrigin,
                       );
                     }
