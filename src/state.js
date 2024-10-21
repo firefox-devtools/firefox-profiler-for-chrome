@@ -4,13 +4,17 @@
 
 // @ts-check
 
+/**
+ * @typedef {"idle" | "starting" | "recording" |  "stopping"} RecordingState
+ */
+
 export const state = {
   /**
    * Tracing state.
-   * @type {boolean}
+   * @type {RecordingState}
    * @public
    */
-  isTracing: false,
+  recordingState: "idle",
   /**
    * Tab ID of the current traced tab.
    * @type {number | null}
@@ -19,14 +23,14 @@ export const state = {
   tabId: null,
 
   startTracing() {
-    this.isTracing = true;
+    this.recordingState = "recording";
     setIcons("on");
     chrome.action.setTitle({ title: "Click to capture the trace" });
   },
 
   reset() {
     // Reset the state
-    this.isTracing = false;
+    this.recordingState = "idle";
     this.tabId = null;
     setIcons("off");
     chrome.action.setTitle({ title: "Click to start tracing" });

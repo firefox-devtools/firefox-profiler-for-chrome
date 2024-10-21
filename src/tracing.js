@@ -40,6 +40,8 @@ export async function startTracing() {
     return;
   }
 
+  state.recordingState = "starting";
+
   await chrome.debugger.attach({ tabId }, "1.3");
 
   // Define tracing categories
@@ -102,6 +104,7 @@ export async function stopTracingAndCollect() {
     console.warn("Failed to get the Tab ID");
     return;
   }
+  state.recordingState = "stopping";
 
   // Add the event listener first and then stop the tracing.
   chrome.debugger.onEvent.addListener(
@@ -127,7 +130,6 @@ export async function stopTracingAndCollect() {
         chrome.debugger.detach({ tabId }, () => {
           console.log("Debugger detached");
         });
-        state.reset();
 
         openProfile(profileChunks);
 
@@ -154,6 +156,7 @@ export async function stopTracing() {
     console.warn("Failed to get the Tab ID");
     return;
   }
+  state.recordingState = "stopping";
 
   // Stop tracing without collecting the trace.
   await chrome.debugger.sendCommand({ tabId }, "Tracing.end");
@@ -294,13 +297,24 @@ async function openProfile(profileChunks) {
 
             // If there are more chunks, send the next one
             if (chunkIndex < totalChunks) {
-              setTimeout(sendNextChunk, 50); // Small delay between chunks
+              /**
+               * @type {Promise<void>}
+               */
+              const promise = new Promise(
+                (resolve) =>
+                  setTimeout(async () => {
+                    await sendNextChunk();
+                    resolve();
+                  }, 50), // Small delay between chunks
+              );
+              await promise;
             } else {
               console.log("All chunks sent");
             }
           }
 
-          sendNextChunk();
+          await sendNextChunk();
+          state.reset();
           chrome.tabs.onUpdated.removeListener(listener);
         }
       },

@@ -7,6 +7,7 @@
 import { state } from "./state.js";
 import { isTabAllowedToAttach, getCurrentTab } from "./tabs.js";
 import { startTracing, stopTracingAndCollect, stopTracing } from "./tracing.js";
+import { assertExhaustiveCheck } from "./ts.js";
 
 /**
  * onClick listener for the extension toolbar button.
@@ -20,10 +21,18 @@ chrome.action.onClicked.addListener(async (tab) => {
     state.tabId = tab.id;
   }
 
-  if (!state.isTracing) {
-    await startTracing();
-  } else {
-    await stopTracingAndCollect();
+  switch (state.recordingState) {
+    case "idle":
+      await startTracing();
+      break;
+    case "recording":
+      await stopTracingAndCollect();
+      break;
+    case "starting":
+    case "stopping":
+      break;
+    default:
+      assertExhaustiveCheck(state.recordingState);
   }
 });
 
@@ -49,16 +58,33 @@ chrome.commands.onCommand.addListener(async (command) => {
 
   switch (command) {
     case "start-stop-profiler": {
-      if (state.isTracing) {
-        await stopTracing();
-      } else {
-        await startTracing();
+      switch (state.recordingState) {
+        case "idle":
+          await startTracing();
+          break;
+        case "recording":
+          await stopTracing();
+          break;
+        case "starting":
+        case "stopping":
+          break;
+        default:
+          assertExhaustiveCheck(state.recordingState);
       }
+
       break;
     }
     case "stop-profiler-and-capture": {
-      if (state.isTracing) {
-        await stopTracingAndCollect();
+      switch (state.recordingState) {
+        case "recording":
+          await stopTracingAndCollect();
+          break;
+        case "idle":
+        case "starting":
+        case "stopping":
+          break;
+        default:
+          assertExhaustiveCheck(state.recordingState);
       }
       break;
     }
