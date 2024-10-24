@@ -13,7 +13,6 @@
   "host_permissions": [
     "https://profiler.firefox.com/*",
     "http://localhost:4242/*",
-    "https://deploy-preview-5148--perf-html.netlify.app/"
   ],
   "background": {
     "service_worker": "src/background.js",

@@ -18,7 +18,7 @@ both browsers.
 
 ## Development
 
-Currently there is no bunlder in the project for faster development. But we do
+Currently there is no bundler in the project for faster development. But we do
 rely on [TypeScript using JSDoc](https://www.typescriptlang.org/docs/handbook/jsdoc-supported-types.html)
 and we have `eslint` and `prettier` to ensure basic code formatting and linting
 standards are consistently applied across the codebase.
@@ -29,10 +29,3 @@ After your changes, please make sure to have successful `yarn ts`, `yarn lint`,
 and `yarn prettier` results.
 
 Alternatively you can run `yarn test-all` to run all of them.
-
-## Important Note
-
-It's still Work in progress. Also, currently it requires a patched Firefox
-Profiler frontend, that's why it currently opens up a deploy preview URL.
-Alternatively you can clone the repo and pull [this PR](https://github.com/firefox-devtools/profiler/pull/5148)
-to be able to use localhost.
