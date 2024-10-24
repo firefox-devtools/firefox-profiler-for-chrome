@@ -12,7 +12,7 @@
   ],
   "host_permissions": [
     "https://profiler.firefox.com/*",
-    "http://localhost:4242/*",
+    "http://localhost:4242/*"
   ],
   "background": {
     "service_worker": "src/background.js",
