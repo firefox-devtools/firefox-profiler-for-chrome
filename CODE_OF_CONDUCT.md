@@ -29,4 +29,3 @@ faith may face temporary or permanent repercussions.
 
 If you prefer you may also (but you're not obliged to) contact our team member
 [Nazım Can Altınova \<naltinova+coc@mozilla.com\>](mailto:naltinova+coc@mozilla.com).
-
