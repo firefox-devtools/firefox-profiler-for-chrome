@@ -1,9 +1,16 @@
 {
-  "name": "chrome-firefox-profiler",
+  "name": "Firefox Profiler for Chrome",
   "version": "1.0.0",
-  "main": "index.js",
+  "private": true,
   "author": "Nazım Can Altınova <canaltinova@gmail.com>",
-  "license": "MIT",
+  "license": "MPL-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/firefox-devtools/firefox-profiler-for-chrome"
+  },
+  "bugs": {
+    "url": "https://github.com/firefox-devtools/firefox-profiler-for-chrome/issues"
+  },
   "scripts": {
     "lint": "eslint **/*.js",
     "prettier": "prettier . --check",
