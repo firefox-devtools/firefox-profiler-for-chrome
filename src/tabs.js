@@ -26,7 +26,8 @@ export async function getCurrentTab() {
 export function isTabAllowedToAttach(tab) {
   if (
     !tab.url?.startsWith("chrome://") &&
-    !tab.url?.startsWith("chrome-extension://")
+    !tab.url?.startsWith("chrome-extension://") &&
+    !tab.url?.startsWith("https://chromewebstore.google.com/")
   ) {
     // It's not a privileged page.
     return true;
