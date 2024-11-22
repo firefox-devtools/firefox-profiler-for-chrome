@@ -4,6 +4,9 @@
 
 // @ts-check
 
+import { isPrivilegedUrl } from "./tabs.js";
+import { assertExhaustiveCheck } from "./ts.js";
+
 /**
  * @typedef {"idle" | "starting" | "recording" |  "stopping"} RecordingState
  */
@@ -34,6 +37,43 @@ export const state = {
     this.tabId = null;
     setIcons("off");
     chrome.action.setTitle({ title: "Click to start tracing" });
+  },
+
+  /**
+   *
+   * Update the popup state depending on the recording state as well as whether
+   * we are in a privileged page.
+   * @param {number} tabId
+   * @param {string | undefined} url
+   */
+  updatePopupForTab(tabId, url) {
+    if (!url) {
+      // For some reason we don't know the url, return without doing anything.
+      return;
+    }
+
+    // Update the popup state depending on the recording state that we are in.
+    switch (this.recordingState) {
+      case "recording":
+      case "starting":
+      case "stopping":
+        // Make sure that we don't have a popup set while recording.
+        chrome.action.setPopup({
+          tabId,
+          // Empty string means no popup.
+          popup: "",
+        });
+        break;
+      case "idle": {
+        // We want to update the popup now.
+        // Empty string means no popup will be shown.
+        const popup = isPrivilegedUrl(url) ? "src/disabled_popup.html" : "";
+        chrome.action.setPopup({ tabId, popup });
+        break;
+      }
+      default:
+        assertExhaustiveCheck(this.recordingState);
+    }
   },
 };
 

@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Firefox Profiler - Profiling Not Available</title>
+    <style>
+      :root {
+        --bg-color: #ffffff;
+        --text-color: #333;
+        --heading-color: #d32f2f;
+        --note-color: #666;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg-color: #2a2a2a;
+          --text-color: #f0f0f0;
+          --heading-color: #ff6b6b;
+          --note-color: #aaa;
+        }
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        width: 370px;
+        box-sizing: border-box;
+        padding: 20px;
+      }
+
+      h1 {
+        color: var(--heading-color);
+        font-size: 20px;
+        margin-top: 0;
+        display: flex;
+        align-items: center;
+      }
+
+      h1 svg {
+        margin-right: 10px;
+      }
+
+      p {
+        font-size: 14px;
+        line-height: 1.5;
+        margin-bottom: 15px;
+      }
+
+      .note {
+        font-style: italic;
+        color: var(--note-color);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>
+      <svg
+        width="24"
+        height="24"
+        fill="currentColor"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path d="M12.875 15.625h-1.75v1.75h1.75v-1.75z" />
+        <path
+          fill-rule="evenodd"
+          clip-rule="evenodd"
+          d="M11.125 14V9h1.75v5h-1.75z"
+        />
+        <path
+          d="M11.956 4.92c.165 0 .47.05.655.385l7.04 12.66a.729.729 0 0 1-.009.745.726.726 0 0 1-.646.37H5.004a.727.727 0 0 1-.645-.368.728.728 0 0 1-.012-.743L11.3 5.309a.725.725 0 0 1 .657-.389zm0-1.75c-.859 0-1.717.433-2.19 1.297l-6.953 12.66c-.915 1.666.29 3.703 2.191 3.703h13.993c1.907 0 3.112-2.049 2.185-3.715l-7.04-12.66a2.478 2.478 0 0 0-2.186-1.285z"
+        />
+      </svg>
+      Profiling Not Possible
+    </h1>
+    <p>Profiling is not available on this page.</p>
+    <p>
+      This is a privileged or restricted page (e.g., <code>chrome://</code>,
+      <code>about://</code>, or the Chrome Web Store).
+    </p>
+    <p class="note">
+      Please navigate to a non-privileged page to use the Firefox Profiler.
+    </p>
+  </body>
+</html>
