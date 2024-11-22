@@ -13,16 +13,16 @@ import { assertExhaustiveCheck } from "./ts.js";
  * onClick listener for the extension toolbar button.
  */
 chrome.action.onClicked.addListener(async (tab) => {
-  if (!isTabAllowedToAttach(tab)) {
-    return;
-  }
-
   if (!state.tabId && tab.id !== undefined) {
     state.tabId = tab.id;
   }
 
   switch (state.recordingState) {
     case "idle":
+      // Only check this when we need to start profiling. We can stop at any time.
+      if (!isTabAllowedToAttach(tab)) {
+        return;
+      }
       await startTracing();
       break;
     case "recording":
@@ -48,10 +48,6 @@ chrome.commands.onCommand.addListener(async (command) => {
     return;
   }
 
-  if (!isTabAllowedToAttach(tab)) {
-    return;
-  }
-
   if (!state.tabId && tab.id !== undefined) {
     state.tabId = tab.id;
   }
@@ -60,6 +56,10 @@ chrome.commands.onCommand.addListener(async (command) => {
     case "start-stop-profiler": {
       switch (state.recordingState) {
         case "idle":
+          // Only check this when we need to start profiling. We can stop at any time.
+          if (!isTabAllowedToAttach(tab)) {
+            return;
+          }
           await startTracing();
           break;
         case "recording":
