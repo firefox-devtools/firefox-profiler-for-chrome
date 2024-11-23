@@ -16,7 +16,8 @@
     "prettier": "prettier . --check",
     "prettier-fix": "prettier . --write",
     "ts": "tsc",
-    "test-all": "run-p lint prettier ts"
+    "test-all": "run-p lint prettier ts",
+    "package": "zip -r firefox-profiler.zip manifest.json LINCESE src/ icons/"
   },
   "devDependencies": {
     "@eslint/js": "^9.11.1",
