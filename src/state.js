@@ -31,6 +31,12 @@ export const state = {
     chrome.action.setTitle({ title: "Click to capture the trace" });
   },
 
+  stopping() {
+    this.recordingState = "stopping";
+    setIcons("stopping");
+    chrome.action.setTitle({ title: "Capturing a trace" });
+  },
+
   reset() {
     // Reset the state
     this.recordingState = "idle";
@@ -79,7 +85,7 @@ export const state = {
 
 /**
  * Sets the icon of the extension
- * @param {"on" | "off"} variant
+ * @param {"on" | "off" | "stopping"} variant
  */
 function setIcons(variant) {
   chrome.action.setIcon({

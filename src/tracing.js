@@ -101,7 +101,7 @@ export async function stopTracingAndCollect() {
     console.warn("Failed to get the Tab ID");
     return;
   }
-  state.recordingState = "stopping";
+  state.stopping();
 
   // Add the event listener first and then stop the tracing.
   chrome.debugger.onEvent.addListener(
@@ -153,7 +153,7 @@ export async function stopTracing() {
     console.warn("Failed to get the Tab ID");
     return;
   }
-  state.recordingState = "stopping";
+  state.stopping();
 
   // Stop tracing without collecting the trace.
   await chrome.debugger.sendCommand({ tabId }, "Tracing.end");
