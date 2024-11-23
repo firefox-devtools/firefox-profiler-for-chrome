@@ -95,20 +95,17 @@ chrome.commands.onCommand.addListener(async (command) => {
 
 // Listener for tab updates, like navigation.
 chrome.tabs.onUpdated.addListener((tabId, _changeInfo, tab) => {
-  console.log("canova tab update", tab.url);
   state.updatePopupForTab(tabId, tab.url);
 });
 
 // Listener for tab activation (e.g., switching tabs)
 chrome.tabs.onActivated.addListener(async (activeInfo) => {
-  console.log("canova tab activation");
   const tab = await chrome.tabs.get(activeInfo.tabId);
   state.updatePopupForTab(activeInfo.tabId, tab.url);
 });
 
 // Listener for when the extension is installed or updated
 chrome.runtime.onInstalled.addListener(async () => {
-  console.log("canova on installed");
   const tab = await getCurrentTab();
   if (!tab || !tab.id) {
     console.error("Failed to find the current tab");
