@@ -6,7 +6,7 @@
     <title>Firefox Profiler - Profiling Not Available</title>
     <style>
       :root {
-        --bg-color: #ffffff;
+        --bg-color: #fff;
         --text-color: #333;
         --heading-color: #d32f2f;
         --note-color: #666;
@@ -21,23 +21,26 @@
         }
       }
 
+      html {
+        width: 370px;
+      }
+
       body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 20px;
-        background-color: var(--bg-color);
-        color: var(--text-color);
         width: 370px;
         box-sizing: border-box;
         padding: 20px;
+        margin: 0;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        font-family: Arial, sans-serif;
       }
 
       h1 {
-        color: var(--heading-color);
-        font-size: 20px;
-        margin-top: 0;
         display: flex;
         align-items: center;
+        margin-top: 0;
+        color: var(--heading-color);
+        font-size: 20px;
       }
 
       h1 svg {
@@ -45,14 +48,14 @@
       }
 
       p {
+        margin-bottom: 15px;
         font-size: 14px;
         line-height: 1.5;
-        margin-bottom: 15px;
       }
 
       .note {
-        font-style: italic;
         color: var(--note-color);
+        font-style: italic;
       }
     </style>
   </head>
