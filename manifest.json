@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Firefox Profiler",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A Chrome extension to capture performance profiles with Chrome's tracing profiler and export them directly to Firefox Profile Viewer",
   "minimum_chrome_version": "92",
   "icons": {
