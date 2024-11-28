@@ -10,13 +10,7 @@
     "48": "icons/off/icon48.png",
     "128": "icons/off/icon128.png"
   },
-  "permissions": [
-    "activeTab",
-    "scripting",
-    "tabs",
-    "debugger",
-    "notifications"
-  ],
+  "permissions": ["activeTab", "scripting", "tabs", "debugger"],
   "host_permissions": ["https://profiler.firefox.com/*"],
   "background": {
     "service_worker": "src/background.js",
