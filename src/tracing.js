@@ -43,7 +43,7 @@ export async function startTracing() {
 
   // Define tracing categories
   // The settings used by the devtools can be found here:
-  // https://source.chromium.org/chromium/chromium/src/+/main:third_party/devtools-frontend/src/front_end/panels/timeline/TimelineController.ts;l=87-103;drc=a59de5d27b5977b0bb8d260634f1d8d45e69cfdf
+  // https://source.chromium.org/chromium/chromium/src/+/main:third_party/devtools-frontend/src/front_end/panels/timeline/TimelineController.ts;l=231-252;drc=bdf12da1f4149ce4d2acb156940f1e443b63996d
   // and by puppeteer here:
   // https://github.com/puppeteer/puppeteer/blob/ce1ed7ad74a90acc37f2a5e284ad8d8da360e462/packages/puppeteer-core/src/cdp/Tracing.ts#L72-L84
   // Looks like puppeteer uses fewer categories than the devtools one, trying
@@ -56,6 +56,11 @@ export async function startTracing() {
     "disabled-by-default-devtools.timeline",
     "disabled-by-default-devtools.timeline.frame",
     "disabled-by-default-devtools.timeline.stack",
+    "disabled-by-default-devtools.target-rundown",
+    "disabled-by-default-devtools.v8-source-rundown-sources",
+    "disabled-by-default-devtools.v8-source-rundown",
+    "disabled-by-default-layout_shift.debug",
+    "disabled-by-default-v8.inspector",
     "toplevel",
     "blink.console",
     "blink.user_timing",
@@ -64,7 +69,7 @@ export async function startTracing() {
     "disabled-by-default-v8.cpu_profiler",
     "disabled-by-default-v8.cpu_profiler.hires",
     "disabled-by-default-devtools.screenshot",
-    "lighthouse",
+    "disabled-by-default-lighthouse",
     "cppgc",
     "navigation,rail",
   ];
