@@ -13,15 +13,17 @@ import { assertExhaustiveCheck } from "./ts.js";
  * onClick listener for the extension toolbar button.
  */
 chrome.action.onClicked.addListener(async (tab) => {
-  if (!state.tabId && tab.id !== undefined) {
-    state.tabId = tab.id;
-  }
-
   switch (state.recordingState) {
     case "idle":
       // Only check this when we need to start profiling. We can stop at any time.
       if (!isTabAllowedToAttach(tab)) {
         return;
+      }
+      // Adopt the tab only after we know we're allowed to attach to it, so a
+      // rejected privileged page doesn't leave a stale tabId pointing at the
+      // wrong tab for the next recording.
+      if (tab.id !== undefined) {
+        state.tabId = tab.id;
       }
       await startTracing();
       break;
@@ -48,10 +50,6 @@ chrome.commands.onCommand.addListener(async (command) => {
     return;
   }
 
-  if (!state.tabId && tab.id !== undefined) {
-    state.tabId = tab.id;
-  }
-
   switch (command) {
     case "start-stop-profiler": {
       switch (state.recordingState) {
@@ -59,6 +57,12 @@ chrome.commands.onCommand.addListener(async (command) => {
           // Only check this when we need to start profiling. We can stop at any time.
           if (!isTabAllowedToAttach(tab)) {
             return;
+          }
+          // Adopt the tab only after we know we're allowed to attach to it, so
+          // a rejected privileged page doesn't leave a stale tabId pointing at
+          // the wrong tab for the next recording.
+          if (tab.id !== undefined) {
+            state.tabId = tab.id;
           }
           await startTracing();
           break;
