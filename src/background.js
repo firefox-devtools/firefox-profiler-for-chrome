@@ -104,6 +104,20 @@ chrome.tabs.onActivated.addListener(async (activeInfo) => {
   state.updatePopupForTab(activeInfo.tabId, tab.url);
 });
 
+// Listener for when the debugger is detached. Users might detach the debugger
+// using the "cancel" button on the debugger toolbar instead of the profiler
+// button or keyboard shortcut, in which case we should reset the state. This is
+// registered once to avoid accumulating a new listener on every recording.
+chrome.debugger.onDetach.addListener((source) => {
+  // Ignore detaches for tabs we aren't tracing.
+  if (source.tabId !== state.tabId) {
+    return;
+  }
+
+  console.log("Debugger onDetach listener");
+  state.reset();
+});
+
 // Listener for when the extension is installed or updated
 chrome.runtime.onInstalled.addListener(async () => {
   const tab = await getCurrentTab();

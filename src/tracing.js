@@ -102,15 +102,6 @@ export async function startTracing() {
   }
 
   state.startTracing();
-
-  chrome.debugger.onDetach.addListener(() => {
-    console.log("Debugger onDetach listener");
-
-    // Users might detach the debugger using the "cancel" button on the debugger
-    // toolbar instead of the profiler button or keyboard shortcut.
-    // We should reset the state.
-    state.reset();
-  });
 }
 
 /**
