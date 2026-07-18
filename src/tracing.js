@@ -39,7 +39,16 @@ export async function startTracing() {
 
   state.recordingState = "starting";
 
-  await chrome.debugger.attach({ tabId }, "1.3");
+  try {
+    await chrome.debugger.attach({ tabId }, "1.3");
+  } catch (error) {
+    // Attaching can fail, for example when another debugger (like the DevTools)
+    // is already attached to the tab. Reset the state so the user isn't stuck
+    // in the "starting" state with no way to recover.
+    console.error("Failed to attach the debugger:", error);
+    state.reset();
+    return;
+  }
 
   // Define tracing categories
   // The settings used by the devtools can be found here:
@@ -74,12 +83,23 @@ export async function startTracing() {
     "navigation,rail",
   ];
 
-  await chrome.debugger.sendCommand({ tabId }, "Tracing.start", {
-    traceConfig: {
-      includedCategories: defaultCategories,
-    },
-    transferMode: "ReturnAsStream",
-  });
+  try {
+    await chrome.debugger.sendCommand({ tabId }, "Tracing.start", {
+      traceConfig: {
+        includedCategories: defaultCategories,
+      },
+      transferMode: "ReturnAsStream",
+    });
+  } catch (error) {
+    // If we managed to attach but failed to start tracing, detach the debugger
+    // and reset the state so the user isn't stuck in the "starting" state.
+    console.error("Failed to start tracing:", error);
+    chrome.debugger.detach({ tabId }, () => {
+      console.log("Debugger detached after a failed Tracing.start");
+    });
+    state.reset();
+    return;
+  }
 
   state.startTracing();
 
